@@ -1,7 +1,9 @@
 package com.an.storehub.services;
 
 import com.an.storehub.dto.request.RegisterRequest;
+import com.an.storehub.dto.request.VerifyOtpRequest;
 import com.an.storehub.dto.response.RegisterResponse;
+import com.an.storehub.dto.response.VerifyOtpResponse;
 import com.an.storehub.enums.OtpType;
 import com.an.storehub.enums.Role;
 import com.an.storehub.enums.UserStatus;
@@ -10,6 +12,7 @@ import com.an.storehub.models.OtpVerification;
 import com.an.storehub.models.User;
 import com.an.storehub.repositories.OtpRepository;
 import com.an.storehub.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -95,5 +98,49 @@ public class AuthService {
         }
 
         return otp.toString();
+    }
+
+    public VerifyOtpResponse verifyOtp(VerifyOtpRequest request) {
+        User user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException("User không tồn tại", 404));
+        if (user.getStatus() == UserStatus.ACTIVE) {
+            throw new AppException("User đã được kích hoạt", 400);
+        }
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            throw new AppException("User đã bị khóa", 400);
+        }
+
+        OtpVerification otpVerification = otpRepository
+                .findTopByUserAndTypeOrderByCreatedAtDesc(user, OtpType.EMAIL_VERIFICATION)
+                .orElseThrow(() -> new AppException(
+                        "OTP không chính xác",
+                        400
+                ));
+
+
+        VerifyOtpResponse response = new VerifyOtpResponse();
+        if (!otpVerification.getExpiresAt().isAfter(LocalDateTime.now())) {
+            throw new AppException(
+                    "OTP đã hết hạn",
+                    400
+            );
+        }
+
+        if (!passwordEncoder.matches(
+                request.getOtp(),
+                otpVerification.getOtp()
+        )) {
+            throw new AppException(
+                    "OTP không chính xác",
+                    400
+            );
+        }
+
+        user.setStatus(UserStatus.ACTIVE);
+        userRepo.save(user);
+
+        response.setMessage("Xác thực mã OTP thành công");
+        return response;
+
     }
 }

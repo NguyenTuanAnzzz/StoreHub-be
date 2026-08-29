@@ -5,6 +5,7 @@ import com.an.storehub.models.OtpVerification;
 import com.an.storehub.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<OtpVerification, Long> {
@@ -20,5 +21,6 @@ public interface OtpRepository extends JpaRepository<OtpVerification, Long> {
             User user,
             OtpType type
     );
+
 }
 
