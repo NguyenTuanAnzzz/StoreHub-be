@@ -1,7 +1,9 @@
 package com.an.storehub.services;
 
+import com.an.storehub.dto.request.LoginRequest;
 import com.an.storehub.dto.request.RegisterRequest;
 import com.an.storehub.dto.request.VerifyOtpRequest;
+import com.an.storehub.dto.response.LoginResponse;
 import com.an.storehub.dto.response.RegisterResponse;
 import com.an.storehub.dto.response.VerifyOtpResponse;
 import com.an.storehub.enums.OtpType;
@@ -12,8 +14,14 @@ import com.an.storehub.models.OtpVerification;
 import com.an.storehub.models.User;
 import com.an.storehub.repositories.OtpRepository;
 import com.an.storehub.repositories.UserRepository;
+import com.an.storehub.security.JwtService;
+import com.an.storehub.security.UserPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
@@ -34,6 +42,12 @@ public class AuthService {
 
     @Autowired
     private OtpRepository otpRepository;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public RegisterResponse register(RegisterRequest request) {
 
@@ -142,5 +156,27 @@ public class AuthService {
         response.setMessage("Xác thực mã OTP thành công");
         return response;
 
+    }
+
+    public LoginResponse login(LoginRequest request) {
+
+        Authentication authentication =
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                request.getEmail(),
+                                request.getPassword()
+                        )
+                );
+
+        UserPrincipal principal =
+                (UserPrincipal) authentication.getPrincipal();
+
+        User user = principal.getUser();
+
+        String token = jwtService.generateToken(user);
+
+        return new LoginResponse(
+                token
+        );
     }
 }

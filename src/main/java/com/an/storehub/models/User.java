@@ -30,6 +30,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(length = 500)
+    private String avatar;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -44,20 +47,15 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-
     @PrePersist
     protected void onCreate() {
-
         LocalDateTime now = LocalDateTime.now();
-
         createdAt = now;
         updatedAt = now;
     }
 
-
     @PreUpdate
     protected void onUpdate() {
-
         updatedAt = LocalDateTime.now();
     }
 }

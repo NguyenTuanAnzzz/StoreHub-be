@@ -1,7 +1,9 @@
 package com.an.storehub.controllers;
 
+import com.an.storehub.dto.request.LoginRequest;
 import com.an.storehub.dto.request.RegisterRequest;
 import com.an.storehub.dto.request.VerifyOtpRequest;
+import com.an.storehub.dto.response.LoginResponse;
 import com.an.storehub.dto.response.RegisterResponse;
 import com.an.storehub.dto.response.VerifyOtpResponse;
 import com.an.storehub.services.AuthService;
@@ -31,4 +33,8 @@ public class AuthController {
         return service.verifyOtp(request);
     }
 
+    @PostMapping("login")
+    public LoginResponse login (@Valid @RequestBody LoginRequest request){
+        return service.login(request);
+    }
 }
