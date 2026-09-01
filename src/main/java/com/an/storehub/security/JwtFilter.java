@@ -24,6 +24,15 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        String path = request.getServletPath();
+
+        return path.startsWith("/oauth2/")
+                || path.startsWith("/login/");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -42,7 +51,6 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
 
             String email = jwtService.extractUsername(token);
-
 
             if (email != null &&
                     SecurityContextHolder
@@ -68,8 +76,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder
                             .getContext()
                             .setAuthentication(authentication);
-
-
                 }
             }
 

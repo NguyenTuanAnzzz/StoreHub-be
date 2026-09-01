@@ -12,5 +12,6 @@ public class GetMyProfileResponse {
     private String name;
     private String email;
     private String phone;
+    private String avatar;
     private Role role;
 }

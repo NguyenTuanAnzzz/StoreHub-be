@@ -1,14 +1,15 @@
 package com.an.storehub.controllers;
 
+import com.an.storehub.dto.request.UpdatePhoneRequest;
 import com.an.storehub.dto.response.GetMyProfileResponse;
+import com.an.storehub.dto.response.UpdatePhoneResponse;
 import com.an.storehub.services.AuthService;
 import com.an.storehub.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/me")
@@ -21,6 +22,11 @@ public class UserController {
     public GetMyProfileResponse getMyProfile(Authentication authentication){
 
         return service.getMyProfile(authentication);
+    }
+
+    @PostMapping("update-phone")
+    public UpdatePhoneResponse updatePhone(Authentication authentication, @Valid @RequestBody UpdatePhoneRequest request){
+        return service.updatePhone(authentication ,request);
     }
 
 }
