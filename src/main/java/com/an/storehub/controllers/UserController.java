@@ -3,6 +3,8 @@ package com.an.storehub.controllers;
 import com.an.storehub.dto.request.UpdatePhoneRequest;
 import com.an.storehub.dto.response.GetMyProfileResponse;
 import com.an.storehub.dto.response.UpdatePhoneResponse;
+import com.an.storehub.dto.response.UpdateProfileResponse;
+import com.an.storehub.dto.request.UpdateProfileRequest;
 import com.an.storehub.services.AuthService;
 import com.an.storehub.services.UserService;
 import jakarta.validation.Valid;
@@ -24,9 +26,17 @@ public class UserController {
         return service.getMyProfile(authentication);
     }
 
-    @PostMapping("update-phone")
+    @PutMapping("update-phone")
     public UpdatePhoneResponse updatePhone(Authentication authentication, @Valid @RequestBody UpdatePhoneRequest request){
         return service.updatePhone(authentication ,request);
+    }
+
+    @PutMapping(value = "/update-profile", consumes = "multipart/form-data")
+    public UpdateProfileResponse updateProfile(
+            Authentication authentication,
+            @Valid @ModelAttribute UpdateProfileRequest request
+    ) {
+        return service.updateProfile(authentication, request);
     }
 
 }
