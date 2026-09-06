@@ -35,22 +35,19 @@ public class Shop {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "business_license", length = 100)
-    private String businessLicense;
+    @Column(length = 100)
+    private String region;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
-    private ShopStatus status = ShopStatus.PENDING;
+    private ShopStatus status = ShopStatus.ACTIVE;
 
-    @Column(name = "rejection_reason", length = 500)
-    private String rejectionReason;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id", nullable = false)
-    private User staff;
-
-    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "shop",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @Builder.Default
     private List<ShopImage> images = new ArrayList<>();
 

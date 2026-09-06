@@ -2,7 +2,9 @@ package com.an.storehub.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -12,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateShopRequest {
 
-    @NotBlank(message = "Tên shop không được để trống")
-    @Size(max = 100, message = "Tên shop tối đa 100 ký tự")
+    @NotBlank(message = "Tên chi nhánh không được để trống")
+    @Size(max = 100, message = "Tên chi nhánh tối đa 100 ký tự")
     private String name;
 
     @Size(max = 500, message = "Mô tả tối đa 500 ký tự")
@@ -24,9 +26,6 @@ public class CreateShopRequest {
 
     @Size(max = 20, message = "Số điện thoại tối đa 20 ký tự")
     private String phone;
-
-    @Size(max = 100, message = "Giấy phép kinh doanh tối đa 100 ký tự")
-    private String businessLicense;
 
     private List<MultipartFile> images;
 }

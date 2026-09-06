@@ -11,10 +11,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateShopResponse {
+
     private Long id;
     private String name;
     private ShopStatus status;
-    private String sellerName;
+    private String address;
+    private String phone;
     private String avatar;
     private LocalDateTime createdAt;
     private String message;
