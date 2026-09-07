@@ -27,6 +27,10 @@ public class ShopService {
             throw new AppException("Tên cửa hàng đã tồn tại", 409);
         }
 
+        if (repo.existsByPhone(request.getPhone())) {
+            throw new AppException("Số điện thoại cửa hàng đã tồn tại", 409);
+        }
+
         Shop shop = Shop.builder()
                 .name(request.getName())
                 .description(request.getDescription())
