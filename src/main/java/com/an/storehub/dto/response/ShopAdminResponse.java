@@ -4,30 +4,18 @@ import com.an.storehub.enums.ShopRegion;
 import com.an.storehub.enums.ShopStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class CreateShopResponse {
-
+public class ShopAdminResponse {
     private Long id;
-
     private String name;
-
-    private ShopRegion region;
-
-    private ShopStatus status;
-
-    private String address;
-
     private String phone;
-
+    private String address;
+    private ShopRegion region;
+    private ShopStatus status;
     private String avatar;
-
     private LocalDateTime createdAt;
-
-    private String message;
+    private LocalDateTime updatedAt;
 }

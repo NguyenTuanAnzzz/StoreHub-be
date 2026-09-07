@@ -2,6 +2,9 @@ package com.an.storehub.services;
 
 import com.an.storehub.dto.request.CreateShopRequest;
 import com.an.storehub.dto.response.CreateShopResponse;
+import com.an.storehub.dto.response.ShopAdminResponse;
+import com.an.storehub.enums.ShopRegion;
+import com.an.storehub.enums.ShopStatus;
 import com.an.storehub.exceptions.AppException;
 import com.an.storehub.models.Shop;
 import com.an.storehub.models.ShopImage;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class ShopService {
@@ -24,28 +28,41 @@ public class ShopService {
     public CreateShopResponse createShop(CreateShopRequest request) {
 
         if (repo.existsByName(request.getName())) {
-            throw new AppException("Tên cửa hàng đã tồn tại", 409);
+            throw new AppException(
+                    "Tên cửa hàng đã tồn tại",
+                    409
+            );
         }
 
         if (repo.existsByPhone(request.getPhone())) {
-            throw new AppException("Số điện thoại cửa hàng đã tồn tại", 409);
+            throw new AppException(
+                    "Số điện thoại cửa hàng đã tồn tại",
+                    409
+            );
         }
 
+        // Tạo Shop
         Shop shop = Shop.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .address(request.getAddress())
                 .phone(request.getPhone())
+                .region(request.getRegion())
+                .status(request.getStatus())
                 .build();
 
+
+        // Upload ảnh
         if (request.getImages() != null) {
 
             for (int i = 0; i < request.getImages().size(); i++) {
 
                 try {
+
                     MultipartFile file = request.getImages().get(i);
 
-                    String imageUrl = cloudinaryService.uploadImage(file);
+                    String imageUrl =
+                            cloudinaryService.uploadImage(file);
 
                     ShopImage shopImage = ShopImage.builder()
                             .image(imageUrl)
@@ -56,6 +73,7 @@ public class ShopService {
                     shop.getImages().add(shopImage);
 
                 } catch (IOException e) {
+
                     throw new AppException(
                             "Không thể upload ảnh",
                             500
@@ -64,15 +82,24 @@ public class ShopService {
             }
         }
 
+
+        // Lưu Shop
         Shop savedShop = repo.save(shop);
 
+
+        // Lấy ảnh đầu tiên làm avatar
         String avatar = savedShop.getImages().isEmpty()
                 ? null
-                : savedShop.getImages().get(0).getImage();
+                : savedShop.getImages()
+                .get(0)
+                .getImage();
 
+
+        // Response
         return new CreateShopResponse(
                 savedShop.getId(),
                 savedShop.getName(),
+                savedShop.getRegion(),
                 savedShop.getStatus(),
                 savedShop.getAddress(),
                 savedShop.getPhone(),
@@ -80,5 +107,49 @@ public class ShopService {
                 savedShop.getCreatedAt(),
                 "Tạo cửa hàng thành công"
         );
+    }
+
+
+
+    public List<ShopAdminResponse> getAllShop(
+            String keyword,
+            ShopRegion region,
+            ShopStatus status
+    ) {
+        List<Shop> shops = repo.findAll();
+
+        return shops.stream()
+                .filter(shop ->
+                        keyword == null ||
+                                shop.getName()
+                                        .toLowerCase()
+                                        .contains(keyword.toLowerCase())
+                )
+                .filter(shop ->
+                        region == null ||
+                                shop.getRegion() == region
+                )
+                .filter(shop ->
+                        status == null ||
+                                shop.getStatus() == status
+                )
+                .map(shop -> {
+                    String avatar = shop.getImages().isEmpty()
+                            ? null
+                            : shop.getImages().get(0).getImage();
+
+                    return new ShopAdminResponse(
+                            shop.getId(),
+                            shop.getName(),
+                            shop.getPhone(),
+                            shop.getAddress(),
+                            shop.getRegion(),
+                            shop.getStatus(),
+                            avatar,
+                            shop.getCreatedAt(),
+                            shop.getUpdatedAt()
+                    );
+                })
+                .toList();
     }
 }

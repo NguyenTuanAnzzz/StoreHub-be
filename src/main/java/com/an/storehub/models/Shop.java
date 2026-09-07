@@ -1,5 +1,6 @@
 package com.an.storehub.models;
 
+import com.an.storehub.enums.ShopRegion;
 import com.an.storehub.enums.ShopStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,7 +37,7 @@ public class Shop {
     private String phone;
 
     @Column(length = 100)
-    private String region;
+    private ShopRegion region;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

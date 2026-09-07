@@ -1,5 +1,7 @@
 package com.an.storehub.dto.request;
 
+import com.an.storehub.enums.ShopRegion;
+import com.an.storehub.enums.ShopStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,10 @@ public class CreateShopRequest {
 
     @Size(max = 20, message = "Số điện thoại tối đa 20 ký tự")
     private String phone;
+
+    private ShopRegion region;
+
+    private ShopStatus status;
 
     private List<MultipartFile> images;
 }
