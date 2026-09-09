@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class ShopAdminResponse {
@@ -15,7 +17,8 @@ public class ShopAdminResponse {
     private String address;
     private ShopRegion region;
     private ShopStatus status;
-    private String avatar;
+    private  String description;
+    private List<String> avatar;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

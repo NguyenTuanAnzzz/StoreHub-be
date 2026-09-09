@@ -16,4 +16,6 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
     boolean existsByNameAndIdNot(String phone, Long id);
 
     boolean existsByPhone(String phone);
+
+    Optional<Shop> findById(Long id);
 }

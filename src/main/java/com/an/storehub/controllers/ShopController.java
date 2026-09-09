@@ -8,10 +8,12 @@ import com.an.storehub.enums.ShopStatus;
 import com.an.storehub.services.ShopService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/shops")
@@ -30,11 +32,20 @@ public class ShopController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public List<ShopAdminResponse> getAllShops(
+    public Page<ShopAdminResponse> getAllShops(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) ShopRegion region,
-            @RequestParam(required = false) ShopStatus status
+            @RequestParam(required = false) ShopStatus status,
+            @PageableDefault(page = 0, size = 10) Pageable pageable
     ) {
-        return service.getAllShop(keyword, region, status);
+        return service.getAllShop(keyword, region, status, pageable);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ShopAdminResponse getShopById(
+            @PathVariable Long id
+    ) {
+        return service.getShopById(id);
     }
 }
