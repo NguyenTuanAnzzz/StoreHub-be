@@ -1,6 +1,7 @@
 package com.an.storehub.services;
 
 import com.an.storehub.dto.request.CreateShopRequest;
+import com.an.storehub.dto.request.UpdateShopRequest;
 import com.an.storehub.dto.response.CreateShopResponse;
 import com.an.storehub.dto.response.ShopAdminResponse;
 import com.an.storehub.enums.ShopRegion;
@@ -9,14 +10,17 @@ import com.an.storehub.exceptions.AppException;
 import com.an.storehub.models.Shop;
 import com.an.storehub.models.ShopImage;
 import com.an.storehub.repositories.ShopRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -120,7 +124,7 @@ public class ShopService {
             ShopStatus status,
             Pageable pageable
     ) {
-        List<Shop> shops = repo.findAll();
+        List<Shop> shops = repo.findAll(Sort.by(Sort.Direction.ASC, "id"));;
 
         List<ShopAdminResponse> responses =  shops.stream()
                 .filter(shop ->
@@ -187,5 +191,67 @@ public class ShopService {
         Shop shop = repo.findById(id).orElseThrow(() -> new AppException("Shop không tồn tại", 404));
         List<String> images = shop.getImages().stream().map(image -> (image.getImage())).toList();
         return new ShopAdminResponse(shop.getId(), shop.getName(), shop.getPhone(), shop.getAddress(), shop.getRegion(),shop.getStatus(), shop.getDescription(), images, shop.getCreatedAt(), shop.getUpdatedAt());
+    }
+
+    public ShopAdminResponse updateShopById(Long id, UpdateShopRequest request) {
+        Shop shop = repo.findById(id).orElseThrow(() -> new AppException("Shop không tồn tại", 404));
+        List<ShopImage> images = new ArrayList<>();
+
+        for (ShopImage oldImage : shop.getImages()) {
+
+            if (request.getOldImages().contains(oldImage.getImage())) {
+                images.add(oldImage);
+            }
+        }
+
+        if(request.getImages() != null){
+            for(int i = 0; i < request.getImages().size(); i++){
+                try{
+                    MultipartFile file = request.getImages().get(i);
+
+                    String url = cloudinaryService.uploadImage(file);
+
+                    ShopImage image = ShopImage.builder()
+                            .image(url)
+                            .displayOrder(i)
+                            .shop(shop)
+                            .build();
+                    images.add(image);
+                }catch (IOException e){
+                    throw new AppException(
+                            "Không thể upload ảnh",
+                            500
+                    );
+                }
+            }
+        }
+        for (int i = 0; i < images.size(); i++) {
+            images.get(i).setDisplayOrder(i);
+        }
+        shop.setName(request.getName());
+        shop.setPhone(request.getPhone());
+        shop.setAddress(request.getAddress());
+        shop.setRegion(request.getRegion());
+        shop.setStatus(request.getStatus());
+        shop.setDescription(request.getDescription());
+        shop.getImages().clear();
+        shop.getImages().addAll(images);
+        Shop savedShop = repo.save(shop);
+
+        return new ShopAdminResponse(
+                savedShop.getId(),
+                savedShop.getName(),
+                savedShop.getPhone(),
+                savedShop.getAddress(),
+                savedShop.getRegion(),
+                savedShop.getStatus(),
+                savedShop.getDescription(),
+                savedShop.getImages()
+                        .stream()
+                        .map(ShopImage::getImage)
+                        .toList(),
+                savedShop.getCreatedAt(),
+                savedShop.getUpdatedAt()
+        );
     }
 }

@@ -18,7 +18,7 @@ public class ShopAdminResponse {
     private ShopRegion region;
     private ShopStatus status;
     private  String description;
-    private List<String> avatar;
+    private List<String> images;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

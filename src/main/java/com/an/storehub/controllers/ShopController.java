@@ -1,6 +1,7 @@
 package com.an.storehub.controllers;
 
 import com.an.storehub.dto.request.CreateShopRequest;
+import com.an.storehub.dto.request.UpdateShopRequest;
 import com.an.storehub.dto.response.CreateShopResponse;
 import com.an.storehub.dto.response.ShopAdminResponse;
 import com.an.storehub.enums.ShopRegion;
@@ -42,10 +43,19 @@ public class ShopController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{id}")
+    @GetMapping("/detail/{id}")
     public ShopAdminResponse getShopById(
             @PathVariable Long id
     ) {
         return service.getShopById(id);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update/{id}")
+    public ShopAdminResponse UpdateShopById(
+            @PathVariable Long id,
+            @Valid @ModelAttribute UpdateShopRequest request
+    ){
+        return service.updateShopById(id, request);
     }
 }
